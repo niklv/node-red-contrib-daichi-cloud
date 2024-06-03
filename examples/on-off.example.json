@@ -24,7 +24,11 @@
     "deviceId": 49905,
     "x": 690,
     "y": 400,
-    "wires": [["4a9d46d5946a0d38"]]
+    "wires": [
+      [
+        "4a9d46d5946a0d38"
+      ]
+    ]
   },
   {
     "id": "04d2421a1dfe326b",
@@ -34,18 +38,26 @@
     "props": [
       {
         "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
       }
     ],
     "repeat": "",
     "crontab": "",
     "once": false,
     "onceDelay": 0.1,
-    "topic": "",
+    "topic": "control",
     "payload": "{\"functionId\":466,\"value\":true}",
     "payloadType": "json",
     "x": 430,
     "y": 400,
-    "wires": [["fad262d7aed99be7"]]
+    "wires": [
+      [
+        "fad262d7aed99be7"
+      ]
+    ]
   },
   {
     "id": "d8541cb4bf55e589",
@@ -55,22 +67,30 @@
     "props": [
       {
         "p": "payload"
+      },
+      {
+        "p": "topic",
+        "vt": "str"
       }
     ],
     "repeat": "",
     "crontab": "",
     "once": false,
     "onceDelay": 0.1,
-    "topic": "",
+    "topic": "control",
     "payload": "{\"functionId\":466,\"value\":false}",
     "payloadType": "json",
     "x": 430,
     "y": 440,
-    "wires": [["fad262d7aed99be7"]]
+    "wires": [
+      [
+        "fad262d7aed99be7"
+      ]
+    ]
   },
   {
     "id": "5056440cd0228dfc",
     "type": "daichi-service",
-    "name": "your@email.com"
+    "name": "niklvov@gmail.com"
   }
 ]
