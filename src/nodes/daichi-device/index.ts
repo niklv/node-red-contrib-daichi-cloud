@@ -26,9 +26,15 @@ export default <NodeInitializer>function (RED) {
       })
     }
 
-    const service = RED.nodes.getNode(config.service) as DaichiServiceNode
+    const service = RED.nodes.getNode(
+      config.service
+    ) as DaichiServiceNode | null
+    if (!service) return
     service.getDeviceState(config.deviceId).then(onDeviceStateChange)
     service.devices.on(config.deviceId, onDeviceStateChange)
+    this.on('close', () => {
+      service.devices.off(config.deviceId, onDeviceStateChange)
+    })
 
     this.on('input', async (message, send, done) => {
       if (message.topic !== 'control') return done()

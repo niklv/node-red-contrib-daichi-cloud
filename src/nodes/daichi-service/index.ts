@@ -32,6 +32,11 @@ export default <NodeInitializer>function (RED) {
       }
     }
 
+    this.on('close', () => {
+      if (!this?.mqtt) return
+      this.mqtt.end(true)
+    })
+
     const init = async () => {
       const mqttUser = await this.api.getMqttUserInfo()
       this.mqtt = connect('wss://split.daichicloud.ru/mqtt', {
