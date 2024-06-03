@@ -1,0 +1,39 @@
+<script type="text/html" data-template-name="daichi-device">
+  <div class="form-row">
+    <label for="node-input-service"
+      ><i class="fa fa fa-bookmark"></i> Name</label
+    >
+    <input type="text" id="node-input-name" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-service"
+      ><i class="fa fa-globe"></i> Credentials</label
+    >
+    <input type="text" id="node-input-service" />
+  </div>
+  <div class="form-row">
+    <label for="node-input-deviceid"
+      ><i class="fa fa-snowflake-o"></i> Device</label
+    >
+    <select id="node-input-deviceId" style="width: 70%" disabled></select>
+  </div>
+</script>
+<!-- prettier-ignore -->
+<script type="text/markdown" data-help-name="daichi-device">
+  Daichi Device
+
+  ### Inputs
+
+: payload (object) :  payload object with functionId (`number`) and value (`boolean|number`)
+: *topic* (string) :  only `control` supported
+
+  ### Outputs
+
+  1. Standard output
+     : payload (object) : Device state
+
+  ### References
+
+  - [Daichi](https://github.com/niklv/daichi/blob/master/src/schemas/daichi.ts)
+</script>
+<!-- prettier-ignore-end -->
