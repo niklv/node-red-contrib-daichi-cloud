@@ -22,7 +22,6 @@ RED.nodes.registerType<DaichiServiceProperties, DaichiServiceCredentials>(
     credentials: daichiServiceCredentialsConfig,
     icon: 'icon.svg',
     paletteLabel: 'daichi service',
-    outputs: 1,
     label() {
       return this.name || 'Daichi-Credentials'
     },
