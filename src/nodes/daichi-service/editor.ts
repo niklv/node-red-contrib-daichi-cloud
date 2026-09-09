@@ -1,33 +1,24 @@
 import type { EditorNodeProperties, EditorRED } from 'node-red'
-import {
-  DaichiServiceOptions,
-  DaichiServiceCredentials,
-  daichiServiceCredentialsConfig
-} from './shared'
+import { type DaichiServiceCredentials, daichiServiceCredentialsConfig } from './shared.js'
 
 declare const RED: EditorRED
 
-interface DaichiServiceProperties
-  extends EditorNodeProperties,
-    DaichiServiceOptions {}
-
-RED.nodes.registerType<DaichiServiceProperties, DaichiServiceCredentials>(
-  'daichi-service',
-  {
-    category: 'config',
-    color: '#aad2ff',
-    defaults: {
-      name: { value: '' }
-    },
-    credentials: daichiServiceCredentialsConfig,
-    icon: 'icon.svg',
-    paletteLabel: 'daichi service',
-    label() {
-      return this.name || 'Daichi-Credentials'
-    },
-    oneditsave() {
-      const nodename = $('#node-config-input-email').val() as string
-      $('#node-config-input-name').val(nodename)
-    }
+RED.nodes.registerType<EditorNodeProperties, DaichiServiceCredentials>('daichi-service', {
+  category: 'config',
+  color: '#aad2ff',
+  defaults: {
+    name: { value: '' }
+  },
+  credentials: daichiServiceCredentialsConfig,
+  icon: 'icon.svg',
+  paletteLabel: 'daichi service',
+  label() {
+    const { name } = this
+    return name === undefined || name === '' ? 'Daichi Cloud account' : name
+  },
+  oneditsave() {
+    // Name the config node after the account it holds.
+    const email = $('#node-config-input-email').val()
+    if (typeof email === 'string') $('#node-config-input-name').val(email)
   }
-)
+})

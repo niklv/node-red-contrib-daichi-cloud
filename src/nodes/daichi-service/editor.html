@@ -1,16 +1,23 @@
 <script type="text/html" data-template-name="daichi-service">
   <input type="hidden" id="node-config-input-name" />
   <div class="form-row">
-    <label for="node-config-input-email">Email</label>
-    <input type="email" id="node-config-input-email" />
+    <label for="node-config-input-email"><i class="fa fa-envelope"></i> Email</label>
+    <input type="email" id="node-config-input-email" placeholder="login@email.com" />
   </div>
   <div class="form-row">
-    <label for="node-config-input-password">Password</label>
+    <label for="node-config-input-password"><i class="fa fa-lock"></i> Password</label>
     <input type="password" id="node-config-input-password" />
   </div>
 </script>
-<!-- prettier-ignore -->
+
 <script type="text/markdown" data-help-name="daichi-service">
-  Node for storage credentials to access [web.daichicloud.ru](https://web.daichicloud.ru)
+  Holds the credentials of a [Daichi Comfort Cloud](https://web.daichicloud.ru)
+  account and keeps one live connection to it.
+
+  Every **daichi device** node in the flow shares this connection: the account is
+  logged in once, and device updates arrive over the cloud's MQTT broker.
+
+  > [!IMPORTANT]
+  > Use the e-mail and password of your Daichi account. They are stored in
+  > Node-RED's credentials file, not in the flow.
 </script>
-<!-- prettier-ignore-end -->

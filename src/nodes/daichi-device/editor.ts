@@ -1,92 +1,95 @@
-import type { EditorNodeProperties, EditorRED } from 'node-red'
-import type { DaichiDeviceOptions } from './shared'
 import type { DaichiBuilding } from 'daichi'
-import type { DaichiServiceNode } from '../daichi-service/shared'
+import type { EditorNodeProperties, EditorRED } from 'node-red'
+import { DISCOVER_URL } from '../daichi-service/shared.js'
+import type { DaichiDeviceOptions } from './shared.js'
+
+interface AccountNode {
+  credentials?: { email?: string; password?: string }
+}
 
 declare const RED: EditorRED
 
-interface DaichiDeviceProperties
-  extends EditorNodeProperties,
-    DaichiDeviceOptions {}
+interface DaichiDeviceProperties extends EditorNodeProperties, DaichiDeviceOptions {}
+
+const requestError = (err: unknown) => {
+  const response = (err as JQuery.jqXHR | undefined)?.responseJSON as { error?: string } | undefined
+  const message = response?.error ?? (err as Error | undefined)?.message
+  return message === undefined || message === '' ? 'Unknown error' : message
+}
 
 RED.nodes.registerType<DaichiDeviceProperties>('daichi-device', {
   category: 'daichi',
   color: '#aad2ff',
   defaults: {
-    name: { value: '', required: true },
+    name: { value: '' },
     service: { value: '', type: 'daichi-service', required: true },
-    deviceId: {
-      value: 0,
-      validate: RED.validators.number(),
-      required: true
-    }
+    deviceId: { value: 0, validate: RED.validators.number(), required: true }
   },
   inputs: 1,
   outputs: 1,
   icon: 'icon.svg',
   paletteLabel: 'daichi device',
   label() {
-    return this.name || 'Daichi device'
+    const { name } = this
+    return name === undefined || name === '' ? 'Daichi device' : name
   },
   oneditprepare() {
     const $service = $('#node-input-service')
     const $devices = $('#node-input-deviceId')
+    const selected = this.deviceId
 
-    function updateDevices(buildings: DaichiBuilding[]) {
-      console.log(buildings)
-      $devices.empty()
-      $devices.prop('disabled', true)
-      const options = buildings
-        .flatMap(
-          building =>
-            building.places.map(place =>
-              $('<option>', {
-                value: place.id,
-                text: `${place.title} (${building.title})`
-              })
-            ) || []
+    function showDevices(buildings: DaichiBuilding[]) {
+      $devices.empty().prop('disabled', true)
+      const options = buildings.flatMap(building =>
+        building.places.map(place =>
+          $('<option>', {
+            value: place.id,
+            text: `${place.title} (${building.title})`
+          })
         )
-        .filter(place => place)
-
+      )
       if (!options.length) return
-      $devices.append(...options)
-      $devices.prop('disabled', false)
+      $devices.append(...options).prop('disabled', false)
+      if (selected) $devices.val(String(selected))
     }
 
-    async function queryBuildings(nodeId: string) {
+    async function loadDevices(nodeId: string) {
+      // Left empty rather than filled with a placeholder option: an option
+      // here would be saved as the device id if the dialog is closed while
+      // the list is still loading.
+      $devices.empty().prop('disabled', true)
       try {
-        const node = RED.nodes.node(nodeId) as DaichiServiceNode
-        const buildings = (await $.post(
-          'daichi-device/discover',
-          node.credentials || {
-            nodeId
-          }
-        )) as DaichiBuilding[]
-        if (!buildings.length) RED.notify(`No daichi devices found`, 'error')
-        updateDevices(buildings)
+        // An account that has been filled in but not deployed yet exists only
+        // in the editor, so its credentials travel with the request. For a
+        // deployed one the editor never holds the password, and the server
+        // reads it from the node id instead.
+        const account: AccountNode | null = RED.nodes.node(nodeId)
+        const buildings = (await $.post(DISCOVER_URL, {
+          nodeId,
+          ...account?.credentials
+        })) as DaichiBuilding[]
+        if (!buildings.length) RED.notify('No Daichi devices found', 'warning')
+        showDevices(buildings)
       } catch (err) {
-        RED.notify(
-          (err as JQuery.jqXHR)?.responseJSON?.error || (err as Error).message,
-          'error'
-        )
-        updateDevices([])
+        RED.notify(requestError(err), 'error')
+        showDevices([])
       }
     }
 
-    $service.on('input', async () => {
+    $service.on('change', () => {
       const nodeId = $service.val()
-      updateDevices([])
-      if (nodeId === '_ADD_' || typeof nodeId !== 'string') return
-      await queryBuildings(nodeId)
+      if (typeof nodeId !== 'string' || !nodeId || nodeId === '_ADD_') {
+        showDevices([])
+        return
+      }
+      void loadDevices(nodeId)
     })
-    if (this.service) queryBuildings(this.service)
+    if (this.service) void loadDevices(this.service)
   },
   oneditsave() {
-    const deviceName = $('#node-input-deviceId option:selected').text()
     const $name = $('#node-input-name')
-    if (!$name.val()) $name.val(deviceName)
-    const deviceVal = $('#node-input-deviceId').val()
-    if (typeof deviceVal === 'string' && deviceVal)
-      this.deviceId = parseInt(deviceVal, 10)
+    if ($name.val() === '') $name.val($('#node-input-deviceId option:selected').text())
+    const deviceId = $('#node-input-deviceId').val()
+    if (typeof deviceId === 'string' && deviceId !== '') this.deviceId = Number(deviceId)
   }
 })

@@ -1,39 +1,40 @@
 <script type="text/html" data-template-name="daichi-device">
   <div class="form-row">
-    <label for="node-input-service"
-      ><i class="fa fa fa-bookmark"></i> Name</label
-    >
-    <input type="text" id="node-input-name" />
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Device name" />
   </div>
   <div class="form-row">
-    <label for="node-input-service"
-      ><i class="fa fa-globe"></i> Credentials</label
-    >
+    <label for="node-input-service"><i class="fa fa-globe"></i> Account</label>
     <input type="text" id="node-input-service" />
   </div>
   <div class="form-row">
-    <label for="node-input-deviceid"
-      ><i class="fa fa-snowflake-o"></i> Device</label
-    >
+    <label for="node-input-deviceId"><i class="fa fa-snowflake-o"></i> Device</label>
     <select id="node-input-deviceId" style="width: 70%" disabled></select>
   </div>
 </script>
-<!-- prettier-ignore -->
+
 <script type="text/markdown" data-help-name="daichi-device">
-  Daichi Device
+  Monitors and controls one air conditioner in Daichi Comfort Cloud.
 
   ### Inputs
 
-: payload (object) :  payload object with functionId (`number`) and value (`boolean|number`)
-: *topic* (string) :  only `control` supported
+  : topic (string) : must be `control`; messages with any other topic are ignored
+  : payload.functionId (number) : the function to change, for example power or target temperature
+  : payload.value (number | boolean) : a number for value functions, a boolean for on/off functions
 
   ### Outputs
 
-  1. Standard output
-     : payload (object) : Device state
+  : topic (string) : always `device-state`
+  : payload (object) : the device state, merged from the last full read and the latest cloud update
+
+  The node sends the device state when the flow starts, whenever the cloud
+  pushes an update, and after every accepted command.
+
+  > [!TIP]
+  > Function ids differ between models. Send `DEBUG=daichi` output or read the
+  > `pult` list of the first message to discover the ids of your own device.
 
   ### References
 
-  - [Daichi](https://github.com/niklv/daichi/blob/master/src/schemas/daichi.ts)
+  - [daichi](https://github.com/niklv/daichi) - the cloud client this node uses
 </script>
-<!-- prettier-ignore-end -->

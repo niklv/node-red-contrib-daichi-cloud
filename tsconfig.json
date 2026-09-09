@@ -1,8 +1,14 @@
 {
-  "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
-    "noEmit": false,
-    "rootDir": "src",
+    "target": "es2022",
+    "lib": ["es2022", "dom"],
+    "module": "nodenext",
+    "noEmit": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true
   },
-  "include": ["src/nodes"]
+  "include": ["src", "tests", "*.mts"]
 }

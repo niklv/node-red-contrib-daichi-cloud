@@ -1,7 +1,0 @@
-*
-!dist/**/*
-!LICENSE
-!README.md
-!package.json
-!yarn.lock
-build.js
